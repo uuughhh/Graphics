@@ -1,12 +1,12 @@
 // Uncomment these following global attributes to silence most warnings of "low" interest:
-/*
+
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(unreachable_code)]
 #![allow(unused_mut)]
 #![allow(unused_unsafe)]
 #![allow(unused_variables)]
-*/
+
 extern crate nalgebra_glm as glm;
 use std::{ mem, ptr, os::raw::c_void };
 use std::thread;
@@ -15,6 +15,7 @@ use std::sync::{Mutex, Arc, RwLock};
 mod shader;
 mod util;
 
+use gl::{GenBuffers, BufferData};
 use glutin::event::{Event, WindowEvent, DeviceEvent, KeyboardInput, ElementState::{Pressed, Released}, VirtualKeyCode::{self, *}};
 use glutin::event_loop::ControlFlow;
 
@@ -54,20 +55,35 @@ fn offset<T>(n: u32) -> *const c_void {
 
 // == // Generate your VAO here
 unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>) -> u32 {
-    // Implement me!
 
-    // Also, feel free to delete comments :)
-
-    // This should:
     // * Generate a VAO and bind it
-    // * Generate a VBO and bind it
-    // * Fill it with data
-    // * Configure a VAP for the data and enable it
-    // * Generate a IBO and bind it
-    // * Fill it with data
-    // * Return the ID of the VAO
+    let mut vertexArrIDs: u32 = 0;
+    gl::GenVertexArrays (1,&mut vertexArrIDs);
+    gl::BindVertexArray(vertexArrIDs);
 
-    0
+    // * Generate a VBO and bind it
+    let mut bufferIDs: u32 = 0;
+    gl::GenBuffers(1,&mut bufferIDs);
+    gl::BindBuffer(gl::ARRAY_BUFFER,bufferIDs);
+
+    // * Fill it with data
+    gl::BufferData(gl::ARRAY_BUFFER,byte_size_of_array(vertices),pointer_to_array(vertices),gl::STATIC_DRAW);
+
+    // * Configure a VAP for the data and enable it
+    gl::VertexAttribPointer (1,3,gl::FLOAT,gl::FALSE,0,offset::<u32>(0));
+    gl::EnableVertexAttribArray(1);
+
+    // * Generate a IBO and bind it
+    let mut indicesBufferIDs: u32 = 0;
+    gl::GenBuffers(1,&mut indicesBufferIDs);
+    gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER,indicesBufferIDs);
+
+    // * Fill it with data
+    gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,byte_size_of_array(indices),pointer_to_array(indices),gl::STATIC_DRAW);
+
+    // * Return the ID of the VAO
+    return vertexArrIDs;
+
 }
 
 
