@@ -79,8 +79,8 @@ unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>) -> u32 {
     );
 
     // * Configure a VAP for the data and enable it
-    gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
-    gl::EnableVertexAttribArray(1);
+    gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
+    gl::EnableVertexAttribArray(0);
 
     // * Generate a IBO and bind it
     let mut indicesBufferIDs: u32 = 0;
@@ -168,10 +168,16 @@ fn main() {
         }
 
         // == // Set up your VAO around here
+        let verticesArr: Vec<f32> = vec![
+        0.6,-0.8,0.8,
+        0.0,0.4,0.0,
+        -0.8,-0.2,0.2,
 
-        let my_vao = unsafe { 1337 };
-        let verticesArr: Vec<f32> = vec![-0.6, -0.6, 0.0, 0.6, -0.6, 0.0, 0.0, 0.6, 0.0];
+        ];
         let indicesArr: Vec<u32> = vec![0, 1, 2];
+        let my_vao = unsafe { create_vao(&verticesArr, &indicesArr) };
+        
+        
 
         // == // Set up your shaders here
 
@@ -249,8 +255,8 @@ fn main() {
                 gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
                 // == // Issue the necessary gl:: commands to draw your scene here
-                gl::BindVertexArray(create_vao(&verticesArr, &indicesArr));
-                gl::DrawElements(gl::TRIANGLES, 3, gl::UNSIGNED_INT, ptr::null());
+                gl::BindVertexArray(my_vao);
+                gl::DrawElements(gl::TRIANGLES, 3, gl::UNSIGNED_INT, offset::<u32>(0));
             }
 
             // Display the new color buffer on the display
