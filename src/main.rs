@@ -59,7 +59,7 @@ fn offset<T>(n: u32) -> *const c_void {
 // ptr::null()
 
 // == // Generate your VAO here
-unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>) -> u32 {
+unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>) -> u32 {
     // * Generate a VAO and bind it
     let mut vertexArrIDs: u32 = 0;
     gl::GenVertexArrays(1, &mut vertexArrIDs);
@@ -81,6 +81,23 @@ unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>) -> u32 {
     // * Configure a VAP for the data and enable it
     gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
     gl::EnableVertexAttribArray(0);
+
+
+    // VBO for colors
+    let mut colorBuffer: u32 = 0;
+    gl::GenBuffers(1, &mut colorBuffer);
+    gl::BindBuffer(gl::ARRAY_BUFFER, colorBuffer);
+
+    gl::BufferData(
+        gl::ARRAY_BUFFER,
+        byte_size_of_array(colors),
+        pointer_to_array(colors),
+        gl::STATIC_DRAW,
+    );
+
+    gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
+    gl::EnableVertexAttribArray(1);
+
 
     // * Generate a IBO and bind it
     let mut indicesBufferIDs: u32 = 0;
@@ -169,13 +186,30 @@ fn main() {
 
         // == // Set up your VAO around here
         let verticesArr: Vec<f32> = vec![
-        0.6,-0.8,0.8,
+        0.0,-0.8,0.0,
+        0.0,-0.4,0.0,
+        -0.2,-0.8,0.0,
+
+        0.0,0.0,0.0,
+        -0.2,-0.4,0.0,
+
         0.0,0.4,0.0,
-        -0.8,-0.2,0.2,
+        -0.2,0.0,0.0,
+        ];
+        let colorArr: Vec<f32> = vec![
+        0.309804,0.184314,0.309804,
+        0.62352,0.372549,0.623529,
+        0.94,0.81,0.99,
+
+        0.8,0.498039,0.196078,
+        0.576471,0.858824,0.439216,
+
+        0.196078, 0.8, 0.196078,
+        0.419608, 0.556863, 0.137255
 
         ];
-        let indicesArr: Vec<u32> = vec![0, 1, 2];
-        let my_vao = unsafe { create_vao(&verticesArr, &indicesArr) };
+        let indicesArr: Vec<u32> = vec![0,1,2,1,3,4,3,5,6];
+        let my_vao = unsafe { create_vao(&verticesArr, &indicesArr,&colorArr) };
         
         
 
@@ -256,7 +290,7 @@ fn main() {
 
                 // == // Issue the necessary gl:: commands to draw your scene here
                 gl::BindVertexArray(my_vao);
-                gl::DrawElements(gl::TRIANGLES, 3, gl::UNSIGNED_INT, offset::<u32>(0));
+                gl::DrawElements(gl::TRIANGLES, 9, gl::UNSIGNED_INT, offset::<u32>(0));
             }
 
             // Display the new color buffer on the display
