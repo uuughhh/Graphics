@@ -95,7 +95,7 @@ unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>) 
         gl::STATIC_DRAW,
     );
 
-    gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
+    gl::VertexAttribPointer(1, 4, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
     gl::EnableVertexAttribArray(1);
 
 
@@ -197,15 +197,15 @@ fn main() {
         -0.2,0.0,0.0,
         ];
         let colorArr: Vec<f32> = vec![
-        0.309804,0.184314,0.309804,
-        0.62352,0.372549,0.623529,
-        0.94,0.81,0.99,
+        0.309804,0.184314,0.309804,0.9,
+        0.62352,0.372549,0.623529,0.9,
+        0.94,0.81,0.99,0.9,
 
-        0.8,0.498039,0.196078,
-        0.576471,0.858824,0.439216,
+        0.8,0.498039,0.196078,0.9,
+        0.576471,0.858824,0.439216,0.9,
 
-        0.196078, 0.8, 0.196078,
-        0.419608, 0.556863, 0.137255
+        0.196078, 0.8, 0.196078,0.9,
+        0.419608, 0.556863, 0.137255,0.9
 
         ];
         let indicesArr: Vec<u32> = vec![0,1,2,1,3,4,3,5,6];
@@ -227,6 +227,7 @@ fn main() {
                 .attach_file("./shaders/simple.frag")
                 .link();
             simple_shader.activate();
+            
         };
 
         // Used to demonstrate keyboard handling for exercise 2.
@@ -281,7 +282,19 @@ fn main() {
                 *delta = (0.0, 0.0); // reset when done
             }
 
+            
+
             // == // Please compute camera transforms here (exercise 2 & 3)
+            unsafe {
+            let transformVal:[f32;16] = [
+                0.5,0.0,0.0,0.0,
+                0.0,1.0,0.0,0.0,
+                0.0,0.0,1.0,0.0,
+                0.0,0.0,0.0,1.0
+            ];
+            gl::UniformMatrix4fv(0,1,gl::FALSE,transformVal.as_ptr());
+            };
+
 
             unsafe {
                 // Clear the color and depth buffers

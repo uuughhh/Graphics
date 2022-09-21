@@ -1,13 +1,17 @@
 #version 430 core
 
-in vec3 position;
+uniform layout(location = 0) mat4x4 transPos;
 
-in vec3 vColor;
+in layout (location=0) vec3 position;
 
-out vec3 vertexColor;
+in layout (location=1) vec4 vColor;
+
+layout (location=1) out vec4 vertexColor;
 
 void main()
 {
-    gl_Position = vec4(position, 1.0f);
+    mat4x4 identityMatrix =  transPos * mat4(1) ;
+    vec4 pos = vec4(position, 1.0f);
+    gl_Position = identityMatrix * pos;
     vertexColor = vColor;
 }
