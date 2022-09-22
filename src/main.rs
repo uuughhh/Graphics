@@ -186,15 +186,15 @@ fn main() {
 
         // == // Set up your VAO around here
         let verticesArr: Vec<f32> = vec![
-        0.0,-0.8,0.0,
-        0.0,-0.4,0.0,
-        -0.2,-0.8,0.0,
+        0.0,-8.0,0.0,
+        0.0,-4.0,0.0,
+        -2.0,-8.0,0.0,
 
         0.0,0.0,0.0,
-        -0.2,-0.4,0.0,
+        -2.0,-4.0,0.0,
 
-        0.0,0.4,0.0,
-        -0.2,0.0,0.0,
+        0.0,4.0,0.0,
+        -2.0,0.0,0.0,
         ];
         let colorArr: Vec<f32> = vec![
         0.309804,0.184314,0.309804,0.9,
@@ -233,6 +233,13 @@ fn main() {
         // Used to demonstrate keyboard handling for exercise 2.
         let mut _arbitrary_number = 0.0; // feel free to remove
 
+        // store keyboard input motion
+        let mut motionX : f32 = 0.0;
+        let mut motionY : f32 = 0.0;
+        let mut motionZ : f32 = 0.0;
+        let mut rotationYaw : f32 = 0.0;
+        let mut rotationPitch : f32 = 0.0;
+
         // The main rendering loop
         let first_frame_time = std::time::Instant::now();
         let mut prevous_frame_time = first_frame_time;
@@ -256,19 +263,52 @@ fn main() {
                 }
             }
 
-            // Handle keyboard input
-            let mut motionX : f32 = 0.0;
+            
 
             if let Ok(keys) = pressed_keys.lock() {
                 for key in keys.iter() {
                     match key {
                         // The `VirtualKeyCode` enum is defined here:
                         //    https://docs.rs/winit/0.25.0/winit/event/enum.VirtualKeyCode.html
+
+                        // Move sideways
                         VirtualKeyCode::A => {
-                            motionX -= 5.0 * delta_time;
+                            motionX += 3.0 * delta_time;
                         }
                         VirtualKeyCode::D => {
-                            motionX += 5.0 * delta_time;
+                            motionX -= 3.0 * delta_time;
+                        }
+
+                        // Move up/down
+                        VirtualKeyCode::S => {
+                            motionY += 3.0 * delta_time;
+                        }
+                        VirtualKeyCode::W => {
+                            motionY -= 3.0 * delta_time;
+                        }
+
+                        // Move up/down
+                        VirtualKeyCode::Space => {
+                            motionZ += 3.0 * delta_time;
+                        }
+                        VirtualKeyCode::LShift => {
+                            motionZ -= 3.0 * delta_time;
+                        }
+
+                        // Yaw rotation
+                        VirtualKeyCode::Left=> {
+                            rotationYaw += 30.0 * delta_time;
+                        }
+                        VirtualKeyCode::Right => {
+                            rotationYaw -= 30.0 * delta_time;
+                        }
+
+                        // Pitch rotation
+                        VirtualKeyCode::Up=> {
+                            rotationPitch += 30.0 * delta_time;
+                        }
+                        VirtualKeyCode::Down => {
+                            rotationPitch -= 30.0 * delta_time;
                         }
 
                         // default handler:
@@ -289,11 +329,20 @@ fn main() {
             // == // Please compute camera transforms here (exercise 2 & 3)
             unsafe {
 
-                let mut camTrans: glm::Mat4 = glm::translation(&glm::vec3(0.0 + motionX, 0.0, 0.0)) * glm::identity();
 
-                let perspec : glm::Mat4 = glm ::perspective(window_aspect_ratio, 15.0, 1.0, 100.0);
+                // matrix for camera transformations
+                let mut camTrans: glm::Mat4 =  glm::identity();
+                camTrans = glm::rotation(rotationYaw.to_radians(), &glm::vec3(0.0, 1.0, 0.0)) * camTrans; // Yaw rotation
+                camTrans = glm::rotation(rotationPitch.to_radians(), &glm::vec3(1.0, 0.0, 0.0)) * camTrans; // Yaw rotation
+                camTrans = glm::scaling(&glm::vec3(1.0 + motionZ, 1.0 + motionZ, 1.0)) * camTrans;
+                camTrans = glm::translation(&glm::vec3(0.0 + motionX , 0.0 + motionY, 0.0 )) * camTrans;
+                // camTrans = glm::rotation(45.0f32.to_radians(), &glm::vec3(1.0, 0.0, 0.0)); * camTrans;
 
-                let transZ : glm::Mat4 = glm::translation(&glm::vec3(0.0, 0.0, -1.0));
+                
+
+                let perspec : glm::Mat4 = glm ::perspective(window_aspect_ratio, 90.0, 1.0, 100.0);
+
+                let transZ : glm::Mat4 = glm::translation(&glm::vec3(0.0, 0.0, -10.0));
 
                 
 
