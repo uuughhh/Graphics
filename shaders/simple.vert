@@ -10,8 +10,7 @@ layout (location=1) out vec4 vertexColor;
 
 void main()
 {
-    mat4x4 identityMatrix =  transPos * mat4(1) ;
     vec4 pos = vec4(position, 1.0f);
-    gl_Position = identityMatrix * pos;
+    gl_Position = transPos * pos;
     vertexColor = vColor;
 }

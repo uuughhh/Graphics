@@ -257,16 +257,18 @@ fn main() {
             }
 
             // Handle keyboard input
+            let mut motionX : f32 = 0.0;
+
             if let Ok(keys) = pressed_keys.lock() {
                 for key in keys.iter() {
                     match key {
                         // The `VirtualKeyCode` enum is defined here:
                         //    https://docs.rs/winit/0.25.0/winit/event/enum.VirtualKeyCode.html
                         VirtualKeyCode::A => {
-                            _arbitrary_number += delta_time;
+                            motionX -= 5.0 * delta_time;
                         }
                         VirtualKeyCode::D => {
-                            _arbitrary_number -= delta_time;
+                            motionX += 5.0 * delta_time;
                         }
 
                         // default handler:
@@ -286,13 +288,18 @@ fn main() {
 
             // == // Please compute camera transforms here (exercise 2 & 3)
             unsafe {
-            let transformVal:[f32;16] = [
-                0.5,0.0,0.0,0.0,
-                0.0,1.0,0.0,0.0,
-                0.0,0.0,1.0,0.0,
-                0.0,0.0,0.0,1.0
-            ];
-            gl::UniformMatrix4fv(0,1,gl::FALSE,transformVal.as_ptr());
+
+                let mut camTrans: glm::Mat4 = glm::translation(&glm::vec3(0.0 + motionX, 0.0, 0.0)) * glm::identity();
+
+                let perspec : glm::Mat4 = glm ::perspective(window_aspect_ratio, 15.0, 1.0, 100.0);
+
+                let transZ : glm::Mat4 = glm::translation(&glm::vec3(0.0, 0.0, -1.0));
+
+                
+
+
+                let finalTrans = camTrans * perspec * transZ;
+                gl::UniformMatrix4fv(0,1,gl::FALSE,finalTrans.as_ptr());
             };
 
 
