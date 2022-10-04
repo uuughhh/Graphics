@@ -2,15 +2,20 @@
 
 uniform layout(location = 0) mat4x4 transPos;
 
-in layout (location=0) vec3 position;
+layout (location=0) in vec3 position;
 
-in layout (location=1) vec4 vColor;
+layout (location=1) in vec3 vColor;
 
-layout (location=1) out vec4 vertexColor;
+layout (location=2) in vec3 vNormal;
+
+layout (location=1) out vec3 vertexColor;
+
+layout (location=2) out vec3 vertexNormal;
 
 void main()
 {
     vec4 pos = vec4(position, 1.0f);
     gl_Position = transPos * pos;
     vertexColor = vColor;
+    vertexNormal = vNormal;
 }

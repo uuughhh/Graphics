@@ -14,6 +14,7 @@ use std::{mem, os::raw::c_void, ptr};
 
 mod shader;
 mod util;
+mod mesh;
 
 use gl::{BufferData, GenBuffers};
 use glutin::event::{
@@ -59,7 +60,7 @@ fn offset<T>(n: u32) -> *const c_void {
 // ptr::null()
 
 // == // Generate your VAO here
-unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>) -> u32 {
+unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>, normals:&Vec<f32>) -> u32 {
     // * Generate a VAO and bind it
     let mut vertexArrIDs: u32 = 0;
     gl::GenVertexArrays(1, &mut vertexArrIDs);
@@ -81,6 +82,22 @@ unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>) 
     // * Configure a VAP for the data and enable it
     gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
     gl::EnableVertexAttribArray(0);
+
+
+    // VBO for normals
+    let mut normalBuffer: u32 = 0;
+    gl::GenBuffers(1, &mut normalBuffer);
+    gl::BindBuffer(gl::ARRAY_BUFFER, normalBuffer);
+
+    gl::BufferData(
+        gl::ARRAY_BUFFER,
+        byte_size_of_array(normals),
+        pointer_to_array(normals),
+        gl::STATIC_DRAW,
+    );
+
+    gl::VertexAttribPointer(2, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
+    gl::EnableVertexAttribArray(2);
 
 
     // VBO for colors
@@ -115,6 +132,8 @@ unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>) 
     // * Return the ID of the VAO
     return vertexArrIDs;
 }
+
+
 
 fn main() {
     // Set up the necessary objects to deal with windows and event handling
@@ -209,7 +228,8 @@ fn main() {
 
         ];
         let indicesArr: Vec<u32> = vec![0,1,2,1,3,4,3,5,6];
-        let my_vao = unsafe { create_vao(&verticesArr, &indicesArr,&colorArr) };
+        let terrain_mesh = mesh::Terrain::load("./resources/lunarsurface.obj");
+        let my_vao = unsafe { create_vao(&terrain_mesh.vertices, &terrain_mesh.indices,&terrain_mesh.colors,&terrain_mesh.normals) };
         
         
 
@@ -287,28 +307,28 @@ fn main() {
                             motionY -= 3.0 * delta_time;
                         }
 
-                        // Move up/down
+                        // Zoom in/out
                         VirtualKeyCode::Space => {
-                            motionZ += 3.0 * delta_time;
+                            motionZ += 1.0 * delta_time;
                         }
                         VirtualKeyCode::LShift => {
-                            motionZ -= 3.0 * delta_time;
+                            motionZ -= 1.0 * delta_time;
                         }
 
                         // Yaw rotation
                         VirtualKeyCode::Left=> {
-                            rotationYaw += 30.0 * delta_time;
+                            rotationYaw += 15.0 * delta_time;
                         }
                         VirtualKeyCode::Right => {
-                            rotationYaw -= 30.0 * delta_time;
+                            rotationYaw -= 15.0 * delta_time;
                         }
 
                         // Pitch rotation
                         VirtualKeyCode::Up=> {
-                            rotationPitch += 30.0 * delta_time;
+                            rotationPitch += 15.0 * delta_time;
                         }
                         VirtualKeyCode::Down => {
-                            rotationPitch -= 30.0 * delta_time;
+                            rotationPitch -= 15.0 * delta_time;
                         }
 
                         // default handler:
@@ -340,7 +360,7 @@ fn main() {
 
                 
 
-                let perspec : glm::Mat4 = glm ::perspective(window_aspect_ratio, 90.0, 1.0, 100.0);
+                let perspec : glm::Mat4 = glm ::perspective(window_aspect_ratio, 90.0, 1.0, 1000.0);
 
                 let transZ : glm::Mat4 = glm::translation(&glm::vec3(0.0, 0.0, -10.0));
 
@@ -359,7 +379,7 @@ fn main() {
 
                 // == // Issue the necessary gl:: commands to draw your scene here
                 gl::BindVertexArray(my_vao);
-                gl::DrawElements(gl::TRIANGLES, 9, gl::UNSIGNED_INT, offset::<u32>(0));
+                gl::DrawElements(gl::TRIANGLES, terrain_mesh.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
             }
 
             // Display the new color buffer on the display

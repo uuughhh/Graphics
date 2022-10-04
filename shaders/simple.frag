@@ -1,10 +1,13 @@
 #version 430 core
 
-in layout (location=1) vec4 vertexColor;
+layout (location=1) in vec3 vertexColor;
+
+layout (location=2) in vec3 vertexNormal;
 
 out vec4 color;
 
 void main()
 {
-    color = vertexColor;
+    vec3 finalLight = vertexNormal * (-lightDirection);
+
 }
