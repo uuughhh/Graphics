@@ -1,6 +1,6 @@
 #version 430 core
 
-layout (location=1) in vec3 vertexColor;
+layout (location=1) in vec4 vertexColor;
 
 layout (location=2) in vec3 vertexNormal;
 
@@ -19,8 +19,8 @@ void main()
 
     vec3 zero = vec3 (0.0f,0.0f,0.0f);
 
-    color = vec4 (vertexColor * maxVec3(finalLight,zero), 1.0);
-    // color = vec4 (vertexNormal.x,vertexNormal.y,vertexNormal.z,1.0);
+    color = vec4 (vertexColor.rgb * maxVec3(finalLight,zero), vertexColor.a);
+    // color = vec4 (vertexColor.rgb * vertexNormal,vertexColor.a);
     
 
 }

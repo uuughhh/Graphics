@@ -102,7 +102,7 @@ unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>, 
     gl::EnableVertexAttribArray(2);
 
 
-    // VBO for colors --RGB
+    // VBO for colors --RGBA
     let mut colorBuffer: u32 = 0;
     gl::GenBuffers(1, &mut colorBuffer);
     gl::BindBuffer(gl::ARRAY_BUFFER, colorBuffer);
@@ -114,7 +114,7 @@ unsafe fn create_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors:&Vec<f32>, 
         gl::STATIC_DRAW,
     );
 
-    gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
+    gl::VertexAttribPointer(1, 4, gl::FLOAT, gl::FALSE, 0, offset::<u32>(0));
     gl::EnableVertexAttribArray(1);
 
 
@@ -320,42 +320,42 @@ fn main() {
 
                         // Move sideways
                         VirtualKeyCode::A => {
-                            motionX += 3.0 * delta_time;
+                            motionX += 25.0 * delta_time;
                         }
                         VirtualKeyCode::D => {
-                            motionX -= 3.0 * delta_time;
+                            motionX -= 25.0 * delta_time;
                         }
 
                         // Move up/down
                         VirtualKeyCode::S => {
-                            motionY += 3.0 * delta_time;
+                            motionY += 25.0 * delta_time;
                         }
                         VirtualKeyCode::W => {
-                            motionY -= 3.0 * delta_time;
+                            motionY -= 25.0 * delta_time;
                         }
 
                         // Zoom in/out
                         VirtualKeyCode::Space => {
-                            motionZ += 1.0 * delta_time;
+                            motionZ += 25.0 * delta_time;
                         }
                         VirtualKeyCode::LShift => {
-                            motionZ -= 1.0 * delta_time;
+                            motionZ -= 25.0 * delta_time;
                         }
 
                         // Yaw rotation
                         VirtualKeyCode::Left=> {
-                            rotationYaw += 10.0 * delta_time;
+                            rotationYaw += 20.0 * delta_time;
                         }
                         VirtualKeyCode::Right => {
-                            rotationYaw -= 10.0 * delta_time;
+                            rotationYaw -= 20.0 * delta_time;
                         }
 
                         // Pitch rotation
                         VirtualKeyCode::Up=> {
-                            rotationPitch += 10.0 * delta_time;
+                            rotationPitch += 20.0 * delta_time;
                         }
                         VirtualKeyCode::Down => {
-                            rotationPitch -= 10.0 * delta_time;
+                            rotationPitch -= 20.0 * delta_time;
                         }
 
                         // default handler:
@@ -381,15 +381,13 @@ fn main() {
                 // matrix for camera transformations
                 camTrans = glm::rotation(rotationYaw.to_radians(), &glm::vec3(0.0, 1.0, 0.0)) * camTrans; // Yaw rotation
                 camTrans = glm::rotation(rotationPitch.to_radians(), &glm::vec3(1.0, 0.0, 0.0)) * camTrans; // Yaw rotation
-                camTrans = glm::scaling(&glm::vec3(1.0 + motionZ, 1.0 + motionZ, 1.0)) * camTrans;
-                camTrans = glm::translation(&glm::vec3(0.0 + motionX , 0.0 + motionY, 0.0 )) * camTrans;
-                // camTrans = glm::rotation(45.0f32.to_radians(), &glm::vec3(1.0, 0.0, 0.0)); * camTrans;
+                camTrans = glm::translation(&glm::vec3(0.0 + motionX , 0.0 + motionY, 0.0 + motionZ)) * camTrans;
 
-                let perspec : glm::Mat4 = glm ::perspective(window_aspect_ratio, 90.0, 1.0, 1000.0);
+                let projection : glm::Mat4 = glm::perspective(window_aspect_ratio, 60.0f32.to_radians(), 1.0, 1000.0);
 
-                let transZ : glm::Mat4 = glm::translation(&glm::vec3(0.0, 0.0, -10.0));
+                let transZ : glm::Mat4 = glm::translation(&glm::vec3(0.0, 0.0, -2.0));
 
-                let finalTrans = camTrans * perspec * transZ;
+                let finalTrans = projection * camTrans * transZ;
                 gl::UniformMatrix4fv(0,1,gl::FALSE,finalTrans.as_ptr());
             };
 
@@ -411,18 +409,18 @@ fn main() {
 
                 // == // Issue the necessary gl:: commands to draw your scene here
                 
-                gl::BindVertexArray(terrain_vao);
-                gl::DrawElements(gl::TRIANGLES, terrain_mesh.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
-                gl::BindVertexArray(body_vao);
-                gl::DrawElements(gl::TRIANGLES, heli_mesh.body.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
-                gl::BindVertexArray(door_vao);
-                gl::DrawElements(gl::TRIANGLES, heli_mesh.door.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
-                gl::BindVertexArray(main_rotor_vao);
-                gl::DrawElements(gl::TRIANGLES, heli_mesh.main_rotor.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
-                gl::BindVertexArray(tail_rotor_vao);
-                gl::DrawElements(gl::TRIANGLES, heli_mesh.tail_rotor.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
+                //gl::BindVertexArray(terrain_vao);
+                //gl::DrawElements(gl::TRIANGLES, terrain_mesh.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
+                // gl::BindVertexArray(body_vao);
+                // gl::DrawElements(gl::TRIANGLES, heli_mesh.body.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
+                // gl::BindVertexArray(door_vao);
+                // gl::DrawElements(gl::TRIANGLES, heli_mesh.door.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
+                // gl::BindVertexArray(main_rotor_vao);
+                // gl::DrawElements(gl::TRIANGLES, heli_mesh.main_rotor.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
+                // gl::BindVertexArray(tail_rotor_vao);
+                // gl::DrawElements(gl::TRIANGLES, heli_mesh.tail_rotor.index_count, gl::UNSIGNED_INT, offset::<u32>(0));
                 
-                // draw_scene(&terrain_node, &camTrans, &glm::identity());
+                draw_scene(&terrain_node, &camTrans, &glm::identity());
             }
 
             // Display the new color buffer on the display
