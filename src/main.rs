@@ -245,11 +245,6 @@ fn main() {
             heli_all_parents.push(heli_parent_node);
         }
 
-        for &child in &terrain_node.children {
-            println!("hi");
-        }
-        
-
         // == // Set up your shaders here
 
         // Basic usage of shader helper:
@@ -400,9 +395,9 @@ fn main() {
                 let posDiff:f32 = (n*30) as f32;
 
                 // animated path
-                // let animatedPath:Heading = toolbox::simple_heading_animation((elapsed-delta_time)*0.5);
-                // heli_parent_node.position = glm::Vec3::new(posDiff + animatedPath.x,0.0,animatedPath.z);
-                // heli_parent_node.rotation = glm::Vec3::new(animatedPath.pitch,animatedPath.yaw,animatedPath.roll);
+                let animatedPath:Heading = toolbox::simple_heading_animation((elapsed-delta_time)*0.5);
+                heli_parent_node.position = glm::Vec3::new(posDiff + animatedPath.x,0.0,animatedPath.z);
+                heli_parent_node.rotation = glm::Vec3::new(animatedPath.pitch,animatedPath.yaw,animatedPath.roll);
 
                 // make rotors rotate
                 heli_parent_node.get_child(1).rotation = glm::Vec3::new(0.0,(elapsed-delta_time) * 720.0f32.to_radians(),0.0);
