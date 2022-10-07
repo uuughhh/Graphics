@@ -12,6 +12,7 @@ layout (location=1) out vec4 vertexColor;
 
 layout (location=2) out vec3 vertexNormal;
 
+
 void main()
 {
     vec4 pos = vec4(position, 1.0f);
